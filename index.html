@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,22 +12,30 @@
             padding: 10px 0;
             text-align: center;
         }
-        h1, h2, h3 {
+
+        h1,
+        h2,
+        h3 {
             color: #00fff2;
         }
-        option{
+
+        option {
             background-color: #363333;
             color: #00fff2;
         }
-        p{
-            color:#ffffff;
+
+        p {
+            color: #ffffff;
         }
-        li{
+
+        li {
             color: bisque;
         }
-        select{
+
+        select {
             margin: 10px 0;
         }
+
         section {
             margin: 20px 0;
             padding: 15px;
@@ -34,15 +43,43 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         code {
             background: #363333;
             color: aliceblue;
             padding: 2px 5px;
             border-radius: 3px;
         }
+
         .red-text {
             color: red;
             font-size: 28px;
+        }
+
+        /* 自定义选择框样式 */
+        .custom-select {
+            color: rgb(88, 222, 255);
+            /* 文字颜色 */
+            background-color: #363333;
+            /* 背景颜色 */
+            width: 10%;
+            /* 宽度 */
+            padding: 5px;
+            /* 内边距 */
+            border-radius: 5px;
+            /* 圆角 */
+            cursor: pointer;
+            /* 鼠标指针样式 */
+            transition: background-color 0.3s, color 0.3s;
+            /* 过渡效果 */
+        }
+
+        .custom-select:hover {
+            background-color: #95d4de7a;
+        }
+
+        .custom-select:focus {
+            background-color: #444;
         }
     </style>
 </head>
@@ -55,18 +92,18 @@
 
     <section v-if="version === '1.5.x'">
         <h2>API 文档 V{{version}}</h2>
-        <select v-model="version" style="color: rgb(88, 222, 255);background: #363333;">
+        <select v-model="version" class="custom-select">
             <option value="1.5.x">V1.5.x</option>
             <option value="1.8.x">V1.8.x</option>
         </select>
-        <h3>数据属性</h3>
+        <h3>属性</h3>
         <ul>
             <li><code>name</code>: 当前用户的名字。</li>
             <li><code>date</code>: 当前日期。</li>
             <li><code>disc</code>: 描述的 HTML 内容。</li>
         </ul>
-        
-        <h3>指令</h3>
+
+        <h3>方法</h3>
         <ul>
             <li><code>v-model</code>: 实现双向数据绑定。</li>
             <li><code>v-html</code>: 渲染 HTML 内容。</li>
@@ -76,17 +113,17 @@
 
     <section v-if="version === '1.8.x'">
         <h2>API 文档 V{{version}}</h2>
-        <select v-model="version" style="color: rgb(88, 222, 255);background: #363333;">
+        <select v-model="version" class="custom-select">
             <option value="1.5.x">V1.5.x</option>
             <option value="1.8.x">V1.8.x</option>
         </select>
         <h3 style="color: aquamarine;">State</h3>
-        <ul>方法
+        <ul>
             <li>当前用户的名字</li>
             <li>当前日期</li>
             <li>描述的 HTML 内容</li>
         </ul>
-        
+
         <h3 style="color: aquamarine;">StateVector</h3>
         <ul>
             <li>实现双向数据绑定</li>
@@ -105,4 +142,5 @@
         });
     </script>
 </div>
+
 </html>
