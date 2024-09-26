@@ -11,12 +11,22 @@
             color: white;
             padding: 10px 0;
             text-align: center;
+            border-radius: 10px;
+        }
+
+        div {
+            border-radius: 14px;
+            border-radius: 10px;
         }
 
         h1,
         h2,
         h3 {
             color: #00fff2;
+        }
+
+        h4 {
+            color: violet;
         }
 
         option {
@@ -34,6 +44,7 @@
 
         select {
             margin: 10px 0;
+            border-radius: 10px;
         }
 
         section {
@@ -45,7 +56,7 @@
         }
 
         code {
-            background: #363333;
+            background: none;
             color: aliceblue;
             padding: 2px 5px;
             border-radius: 3px;
@@ -82,65 +93,187 @@
             background-color: #444;
         }
     </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            background-color: #595757;
+        }
+
+        .code-container {
+            position: relative;
+            background-color: #282c34;
+            color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            /* 每个框之间的间距 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #61dafb;
+            border: none;
+            color: #282c34;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<div id="app">
-    <header>
-        <h1>MinimalisticWPF</h1>
-        <p style="color: aquamarine;">探索简洁、清晰、易于管理的WPF动画实现方案</p>
-        <p style="color: aliceblue;">{{ version }}</p>
-    </header>
 
-    <section v-if="version === '1.5.x'">
-        <h2>API 文档 V{{version}}</h2>
-        <select v-model="version" class="custom-select">
-            <option value="1.5.x">V1.5.x</option>
-            <option value="1.8.x">V1.8.x</option>
-        </select>
-        <h3>属性</h3>
-        <ul>
-            <li><code>name</code>: 当前用户的名字。</li>
-            <li><code>date</code>: 当前日期。</li>
-            <li><code>disc</code>: 描述的 HTML 内容。</li>
-        </ul>
+<body>
+    <div id="app">
+        <header>
+            <h1>MinimalisticWPF</h1>
+            <p style="color: aquamarine;">探索简洁、清晰、易于管理的WPF动画实现方案</p>
+            <p style="color: aliceblue;">{{ version }}</p>
+        </header>
 
-        <h3>方法</h3>
-        <ul>
-            <li><code>v-model</code>: 实现双向数据绑定。</li>
-            <li><code>v-html</code>: 渲染 HTML 内容。</li>
-            <li><code>v-text</code>: 渲染文本内容。</li>
-        </ul>
-    </section>
+        <section v-show="version === '1.8.x'">
+            <h2>API 文档 V{{ version }}</h2>
+            <select v-model="version" class="custom-select">
+                <option value="1.5.x">V1.5.x</option>
+                <option value="1.8.x">V1.8.x</option>
+            </select>
+            <h3 style="color: aquamarine;">Ⅰ State</h3>
+            <p>State用于记录特定时刻对象的属性值,状态机运作时,会使得对象的属性值最终渐变为State内部记录的属性值,这个过程称作从一个状态(State)过渡至另一个状态</p>
+            <h4>示例1.依赖于实例对象,动态地记录属性值</h4>
+            <div id="18x_FromObject"></div>
+            <h4>示例2.不依赖于实例对象,静态地记录属性值</h4>
+            <div id="18x_FromType"></div>
+            <h4>示例3.对象可基于已记录的State,启动过渡</h4>
+            <div id="18x_StateBegin"></div>
 
-    <section v-if="version === '1.8.x'">
-        <h2>API 文档 V{{version}}</h2>
-        <select v-model="version" class="custom-select">
-            <option value="1.5.x">V1.5.x</option>
-            <option value="1.8.x">V1.8.x</option>
-        </select>
-        <h3 style="color: aquamarine;">State</h3>
-        <ul>
-            <li>当前用户的名字</li>
-            <li>当前日期</li>
-            <li>描述的 HTML 内容</li>
-        </ul>
+            <h3 style="color: aquamarine;">Ⅱ StateVector</h3>
+            <p>StateVector用于描述当一个对象满足指定条件时，它应该自动地加载指向哪个State的过渡，也就是状态机特有的【条件切换】功能</p>
+            <p>它会在MVVM模式下使用，你需要让ViewModel实现IConditionalTransition接口，接着在ViewModel内统一建立若干State和一个StateVector，那么当你在控件初始化时调用
+                this.StateMachineLoading(ViewModel) 后，这个控件的部分属性值变动时，可以自动检查是否满足你设置的条件，如果满足，加载动画到指定State</p>
+            <h4>示例.MButton是一个用户控件，使用StateVector实现鼠标悬停改变背景透明度效果</h4>
+            <p>ViewModel定义</p>
+            <div id="18x_StateVectorViewModel"></div>
+            <p>MButton初始化</p>
+            <div id="18x_StateVectorView"></div>
+        </section>
 
-        <h3 style="color: aquamarine;">StateVector</h3>
-        <ul>
-            <li>实现双向数据绑定</li>
-            <li>渲染 HTML 内容</li>
-            <li>渲染文本内容</li>
-        </ul>
-    </section>
+        <!-- Vue 实例 -->
+        <script>
+            new Vue({
+                el: '#app',
+                data: {
+                    version: '1.8.x',
+                }
+            });
+        </script>
+    </div>
 
-    <!-- Vue 实例 -->
+    <!--代码框创建-->
     <script>
-        new Vue({
-            el: '#app',
-            data: {
-                version: '1.8.x',
-            }
-        });
+        //文本+容器ID
+        function createCodeBox(code, id) {
+            // 创建代码容器
+            const container = document.createElement('div');
+            container.className = 'code-container';
+
+            // 创建复制按钮
+            const button = document.createElement('button');
+            button.className = 'copy-button';
+            button.innerText = '复制';
+            button.onclick = () => copyToClipboard(code);
+
+            // 创建预格式代码块
+            const pre = document.createElement('pre');
+            const codeElement = document.createElement('code');
+            codeElement.innerText = code;
+            pre.appendChild(codeElement);
+
+            // 将按钮和代码块添加到容器中
+            container.appendChild(button);
+            container.appendChild(pre);
+
+            // 将代码容器添加到页面上
+            document.getElementById(id).appendChild(container);
+        }
+
+        function copyToClipboard(code) {
+            // 创建临时文本域
+            const tempInput = document.createElement('textarea');
+            tempInput.value = code;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert('复制成功！');
+        }
+
+        // 在页面加载时创建多个代码框
+        window.onload = function () {
+            createCodeBox(`private static State State1 = State.FromType<Grid>()
+    .SetName("TransformChange")
+    .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
+    .SetProperty(x => x.Background, Brushes.Tomato)
+    .ToState();`, "18x_FromType");
+            createCodeBox(`private static State State2 = State.FromObject(new Grid())
+    .SetName("OpacityChange")
+    .SetProperty(x => x.RenderTransform, rotateTransform2, translateTransform2, scaleTransform2)
+    .SetProperty(x => x.Background, Brushes.Cyan)
+    .ToState();`, "18x_FromObject");
+        };
+        createCodeBox(`//描述过渡（动画）效果的细节参数
+private static Action<TransitionParams> TP1 = (x) =>
+{
+    x.IsUnSafe = false;
+    x.Duration = 2;
+    x.Acceleration = -1;
+};
+
+//GD是一个类型实例，此处为Grid控件实例，你可用如下方法使其加载动画，最终使其RenderTransform与Background变为你所记录的目标值（State1中）
+private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e)
+{
+    GD.BeginTransition(State1, TP1);
+}`, "18x_StateBegin");
+createCodeBox(`//ViewModelBase已经实现了IConditionalTransition接口
+public class MButtonViewModel : ViewModelBase<MButtonViewModel, MButtonModel>
+{
+    public MButtonViewModel() { }
+
+    public static State Start = State.FromObject(new MButtonViewModel())
+        .SetName("default")
+        .SetProperty(x => x.HoverBackgroundOpacity, 0)
+        .ToState();
+    public static State MouseIn = State.FromType<MButtonViewModel>()
+        .SetName("mouseInside")
+        .SetProperty(x => x.HoverBackgroundOpacity, 0.2)
+        .ToState();
+
+    public StateVector<MButtonViewModel> ConditionA { get; set; } = StateVector<MButtonViewModel>.Create()
+        .AddCondition(x => x.IsMouseInside, MouseIn, (x) => { x.Duration = 0.2; })
+        .AddCondition(x => !x.IsMouseInside, Start, (x) => { x.Duration = 0.2; });
+
+    public override bool IsMouseInside
+    {
+        get => base.IsMouseInside;
+        set
+        {
+            base.IsMouseInside = value;
+            OnConditionsChecked();
+            //IConditionalTransition接口提供的方法，使得你可在属性变动时，检测当前ViewModel是否满足预先定义的条件判断语句
+            //如果满足x.IsMouseInside,则过渡至MouseIn
+            //如果满足!x.IsMouseInside,则过渡至Start
+        }
+    }
+}`,"18x_StateVectorViewModel");
+createCodeBox(`public MButton()
+{
+    InitializeComponent();
+    this.StateMachineLoading(ViewModel);
+}
+    //这是所有FrameworkElement所具备的状态机加载方法,ViewModel是MButton的DataContext,我这里直接命名为ViewModel比较方便
+    //注意ViewModel必须实现IConditionalTransition接口，否则是无法用这种方式加载状态机以支持【条件切换】功能的`,"18x_StateVectorView")
     </script>
-</div>
+</body>
 
 </html>
