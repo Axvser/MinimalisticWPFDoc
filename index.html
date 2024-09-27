@@ -7,6 +7,21 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/2.0.0/marked.min.js"></script>
     <style>
+        thead{
+            color: white;
+        }
+        summary{
+            color: white;
+        }
+        a{
+            color: lime;
+        }
+        th, td {
+            border: 1px solid white; /* 设置边框 */
+            padding: 8px; /* 添加内边距 */
+            text-align: left; /* 左对齐文本 */
+            color: white;
+        }
         header {
             background: #363333;
             color: white;
@@ -917,7 +932,134 @@ private void GD_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         })
         .Start();
 }`,"18x_GDAnimation");
+createCodeBox(`//可用于BeginTransition的动画绘板
+private static TransitionBoard<Grid> board = Transition.CreateBoardFromType<Grid>()
+    .SetProperty(x=>x.Width,200)
+    .SetProperty(x=>x.Background,Brushes.Cyan)
+    .SetParams(tp_Grid);
+
+//效果参数
+private static Action<TransitionParams> tp_Grid = (x) =>
+{
+    x.IsUnSafe = false;
+    x.Duration = 2;
+};
+
+private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e)
+{
+    //board的确可复用, 不过需要确保类型正确，例如board记录Grid,那么GD也该是个Grid
+    GD.BeginTransition(board);
+}`,"18x_Board");
+createCodeBox(`//动画效果
+private static State component_shared = State.FromType<Grid>()
+    .SetName("TransformChange")
+    .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
+    .ToState();
+
+//效果参数
+private static Action<TransitionParams> tp_Grid = (x) =>
+{
+    x.IsUnSafe = true;
+    x.Duration = 2;
+};
+
+private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e)
+{
+    //若该时刻满足宽度小于1000,则启用指向component_shared（State或TransitionBoard）的动画，动画参数为tp_Grid（TransitionParams）
+    GD.IsSatisfy(x => x.Width < 1000, component_shared, tp_Grid);
+}`,"18x_IsSatisfy");
+createCodeBox(``,"18x_LifeCircle");
+createCodeBox(`//Transform效果定义
+private static RotateTransform rotateTransform = new RotateTransform(90, 50, 50);
+private static TranslateTransform translateTransform = new TranslateTransform(-100, -50);
+private static ScaleTransform scaleTransform = new ScaleTransform(2, 2, 50, 50);
+
+//A与B动画效果重叠的部分
+private static State component_shared = State.FromType<Grid>()
+    .SetName("TransformChange")
+    .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
+    .ToState();
+//控件A的颜色变化分量
+private static State component_A = State.FromType<Grid>()
+    .SetName("TransformChange")
+    .SetProperty(x => x.Background, Brushes.Tomato)
+    .ToState();
+//控件B的颜色变化分量
+private static State component_B = State.FromType<Grid>()
+    .SetName("TransformChange")
+    .SetProperty(x => x.Background, Brushes.Cyan)
+    .ToState();
+
+//设置参数使Grid动画启用UnSafe机制
+private static Action<TransitionParams> tp_Grid = (x) =>
+{
+    x.IsUnSafe = true;
+    x.Duration = 2;
+};
+
+private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e)
+{
+    //应用共享部分
+    GD.BeginTransition(component_shared, tp_Grid);
+    GD2.BeginTransition(component_shared, tp_Grid);
+
+    //应用A的颜色渐变分量
+    GD.BeginTransition(component_A, tp_Grid);
+    //应用B的颜色渐变分量
+    GD2.BeginTransition(component_B, tp_Grid);
+}`,"18x_TwoGD");
+createCodeBox(`//默认颜色
+public static State Default = State.FromType<MPasswordBoxViewModel>()
+    .SetName("default")
+    .SetProperty(x => x.PasswordStrengthColor, Brushes.White)
+    .ToState();
+
+//密码强度有四个分级，对应四个不同的颜色
+public static State Level1 = State.FromType<MPasswordBoxViewModel>()
+    .SetName("L1")
+    .SetProperty(x => x.PasswordStrengthColor, Brushes.Tomato)
+    .ToState();
+public static State Level2 = State.FromType<MPasswordBoxViewModel>()
+    .SetName("L2")
+    .SetProperty(x => x.PasswordStrengthColor, Brushes.Yellow)
+    .ToState();
+public static State Level3 = State.FromType<MPasswordBoxViewModel>()
+    .SetName("L3")
+    .SetProperty(x => x.PasswordStrengthColor, Brushes.Cyan)
+    .ToState();
+public static State Level4 = State.FromType<MPasswordBoxViewModel>()
+    .SetName("L4")
+    .SetProperty(x => x.PasswordStrengthColor, Brushes.Lime)
+    .ToState();
+
+//达到指定密码强度时，切换至指定的State
+public StateVector<MPasswordBoxViewModel> Condition { get; set; } = StateVector<MPasswordBoxViewModel>.Create()
+    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 0, Default, (x) => { x.Duration = 0.3; })
+    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 1, Level1, (x) => { x.Duration = 0.3; })
+    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 2, Level2, (x) => { x.Duration = 0.3; })
+    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 3, Level3, (x) => { x.Duration = 0.3; })
+    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 4, Level4, (x) => { x.Duration = 0.3; });
+
+//ViewModel内部定义的属性
+public string TruePassword
+{
+    get => Model.TruePassword;
+    set
+    {
+        Model.TruePassword = value;
+        string result = string.Empty;
+        for (int i = 0; i < value.Length; i++)
+        {
+            result += ReplacingCharacters;
+        }
+        UIPassword = result;
+        OnPropertyChanged(nameof(TruePassword));
+
+        //调用这句话即可在密码改变时,自动检测强度并执行动画
+        OnConditionsChecked();
+    }
+}`,"18x_MPwd");
+createCodeBox(``,"18x_LotOfActions");
     </script>
 </body>
-
 </html>
