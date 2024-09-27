@@ -38,6 +38,7 @@
 
         code{
             padding-bottom: 20px;
+            color: white;
         }
 
         h1,
@@ -61,6 +62,8 @@
 
         li {
             color: bisque;
+            padding-bottom: 20px;
+            padding-bottom: 20px;
         }
 
         select {
@@ -148,7 +151,7 @@
             <p style="color: aliceblue;">{{ version }}</p>
         </header>
         <section v-show="version === '1.5.x'">
-            <h2>API 文档 V{{ version }}</h2>
+            <h2>中文文档 V{{ version }}</h2>
             <select v-model="version" class="custom-select">
                 <option value="1.5.x">V1.5.x</option>
                 <option value="1.8.x">V1.8.x</option>
@@ -158,12 +161,24 @@
 
 
         <section v-show="version === '1.8.x'">
-            <h2>API 文档 V{{ version }}</h2>
+            <h2>API 用例 V{{ version }}</h2>
             <select v-model="version" class="custom-select">
                 <option value="1.5.x">V1.5.x</option>
                 <option value="1.8.x">V1.8.x</option>
             </select>
-            <h3 style="color: aquamarine;">Ⅰ State</h3>
+            <section>
+                <h1>目录</h1>
+                <ul>
+                    <li><a href="#1">State状态信息</a></li>
+                    <li><a href="#2">StateVector条件切换</a></li>
+                    <li><a href="#3">AnyClass动画扩展</a></li>
+                    <li><a href="#4">生命周期</a></li>
+                    <li><a href="#5">UnSafe</a></li>
+                    <li><a href="#6">最佳实践 → 可以直接阅读这一条以快速掌握用法</a></li>
+                </ul>          
+            </section>
+
+            <h3 id="1" style="color: aquamarine;">Ⅰ State</h3>
             <p>State用于记录特定时刻对象的属性值,状态机运作时,会使得对象的属性值最终渐变为State内部记录的属性值,这个过程称作从一个状态(State)过渡至另一个状态</p>
             <h4>示例1. 依赖于实例对象,动态地记录属性值</h4>
             <div id="18x_FromObject"></div>
@@ -172,7 +187,7 @@
             <h4>示例3. 对象可基于已记录的State,启动过渡</h4>
             <div id="18x_StateBegin"></div>
 
-            <h3 style="color: aquamarine;">Ⅱ StateVector</h3>
+            <h3 id="2" style="color: aquamarine;">Ⅱ StateVector</h3>
             <p>StateVector用于描述当一个对象满足指定条件时，它应该自动地加载指向哪个State的过渡，也就是状态机特有的【条件切换】功能</p>
             <p>它会在MVVM模式下使用，你需要让ViewModel实现IConditionalTransition接口，接着在ViewModel内统一建立若干State和一个StateVector，那么当你在控件初始化时调用
                 this.StateMachineLoading(ViewModel) 后，这个控件的部分属性值变动时，可以自动检查是否满足你设置的条件，如果满足，加载动画到指定State</p>
@@ -182,7 +197,7 @@
             <p>MButton初始化</p>
             <div id="18x_StateVectorView"></div>
 
-            <h3 style="color: aquamarine;">Ⅲ Any Class Transition</h3>
+            <h3 id="3" style="color: aquamarine;">Ⅲ Any Class Transition</h3>
             <p>就没有更方便的写法来启动动画吗？</p>
             <p>有的，其实任何类型的实例对象都拥有统一的API用于快速启动动画效果，状态机加载动画的过程就是对属性值进行平滑修改，因此任何实例对象都可以像下方示例这样启动动画,但前提是，你在SetProperty()内部定义变化时，这个变化的内容必须是一个属性，且属性可读可写</p>
             <h4>示例1. 为一个名为GD的Grid控件同时加载旋转、平移、缩放、变色动画</h4>
@@ -193,7 +208,7 @@
             <h4>实例3. 判断对象满足指定条件后,从State或TransitionBoard加载动画</h4>
             <div id="18x_IsSatisfy"></div>
 
-            <h3 style="color: aquamarine;">Ⅳ 生命周期 - TransitionParams参数</h3>
+            <h3 id="4" style="color: aquamarine;">Ⅳ 生命周期 - TransitionParams参数</h3>
             <p>动画是以帧为单位执行的,状态机加载动画时,你可在每帧开始前、每帧完成后、开始加载前、加载完成时分别执行自定义事件</p>
             <h4>可在Action&lt;TransitionParams&gt;设置以下Action委托以丰富动画过程中的行为</h4>
             <ul>
@@ -204,14 +219,14 @@
             </ul>
             <div id="18x_LifeCircle"></div>
 
-            <h3 style="color: aquamarine;">Ⅴ UnSafe机制 - TransitionParams参数</h3>
+            <h3 id="5" style="color: aquamarine;">Ⅴ UnSafe机制 - TransitionParams参数</h3>
             <p>1.8.0及更高版本</p>
             <p>允许你将复杂动画拆解为若干分量,这将使得动画创建变得像搭积木那样有趣</p>
             <p>不过正如机制本身的名字一样,它并不是安全的,如果有两个“积木”描述的动画分量是存在冲突的,那动画必定会抽搐;或者A分量修改的属性P1在其set器内会修改属性p2,而B分量修改的属性p2在其set器内会修改属性p1,这时就可能导致严重的问题</p>
             <h4>可在Action&lt;TransitionParams&gt;设置IsUnsafe为true来启用该机制</h4>
             <div id="18x_TwoGD"></div>
 
-            <h3 style="color: aquamarine;">Ⅵ 最佳实践</h3>
+            <h3 id="6" style="color: aquamarine;">Ⅵ 最佳实践</h3>
             <h4>示例1. MVVM模式下,实现一个密码框,它的边框颜色会依据当前密码强度动态修改</h4>
             <div id="18x_MPwd"></div>
             <h4>示例2. 非MVVM模式,使动画结构清晰、支持动态修改效果</h4>
