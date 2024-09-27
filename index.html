@@ -991,33 +991,33 @@ createCodeBox(`private static Action<TransitionParams> tp_Grid = (x) =>
         Notification.Message("动画结束时执行一次");
     };
 };`,"18x_LifeCircle");
-createCodeBox(`//Transform效果定义
+createCodeBox(`//启用UnSafe机制
+private static Action<TransitionParams> tp_Grid = (x) =>
+{
+    x.IsUnSafe = true;
+    x.Duration = 2;
+};
+
+//Transform效果定义
 private static RotateTransform rotateTransform = new RotateTransform(90, 50, 50);
 private static TranslateTransform translateTransform = new TranslateTransform(-100, -50);
 private static ScaleTransform scaleTransform = new ScaleTransform(2, 2, 50, 50);
 
 //A与B动画效果重叠的部分
 private static State component_shared = State.FromType<Grid>()
-    .SetName("TransformChange")
+    .SetName("TransformChange1")
     .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
     .ToState();
 //控件A的颜色变化分量
 private static State component_A = State.FromType<Grid>()
-    .SetName("TransformChange")
+    .SetName("TransformChange2")
     .SetProperty(x => x.Background, Brushes.Tomato)
     .ToState();
 //控件B的颜色变化分量
 private static State component_B = State.FromType<Grid>()
-    .SetName("TransformChange")
+    .SetName("TransformChange3")
     .SetProperty(x => x.Background, Brushes.Cyan)
-    .ToState();
-
-//设置参数使Grid动画启用UnSafe机制
-private static Action<TransitionParams> tp_Grid = (x) =>
-{
-    x.IsUnSafe = true;
-    x.Duration = 2;
-};
+    .ToState();      
 
 private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e)
 {
@@ -1030,104 +1030,177 @@ private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e
     //应用B的颜色渐变分量
     GD2.BeginTransition(component_B, tp_Grid);
 }`,"18x_TwoGD");
-createCodeBox(`//默认颜色
-public static State Default = State.FromType<MPasswordBoxViewModel>()
-    .SetName("default")
-    .SetProperty(x => x.PasswordStrengthColor, Brushes.White)
-    .ToState();
-
-//密码强度有四个分级，对应四个不同的颜色
-public static State Level1 = State.FromType<MPasswordBoxViewModel>()
-    .SetName("L1")
-    .SetProperty(x => x.PasswordStrengthColor, Brushes.Tomato)
-    .ToState();
-public static State Level2 = State.FromType<MPasswordBoxViewModel>()
-    .SetName("L2")
-    .SetProperty(x => x.PasswordStrengthColor, Brushes.Yellow)
-    .ToState();
-public static State Level3 = State.FromType<MPasswordBoxViewModel>()
-    .SetName("L3")
-    .SetProperty(x => x.PasswordStrengthColor, Brushes.Cyan)
-    .ToState();
-public static State Level4 = State.FromType<MPasswordBoxViewModel>()
-    .SetName("L4")
-    .SetProperty(x => x.PasswordStrengthColor, Brushes.Lime)
-    .ToState();
-
-//达到指定密码强度时，切换至指定的State
-public StateVector<MPasswordBoxViewModel> Condition { get; set; } = StateVector<MPasswordBoxViewModel>.Create()
-    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 0, Default, (x) => { x.Duration = 0.3; })
-    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 1, Level1, (x) => { x.Duration = 0.3; })
-    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 2, Level2, (x) => { x.Duration = 0.3; })
-    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 3, Level3, (x) => { x.Duration = 0.3; })
-    .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 4, Level4, (x) => { x.Duration = 0.3; });
-
-//ViewModel内部定义的属性
-public string TruePassword
+createCodeBox(`/// <summary>
+/// 作为密码框的DataContext
+/// </summary>
+public class MPasswordBoxViewModel : ViewModelBase<MPasswordBoxViewModel, MPasswordBoxModel>
 {
-    get => Model.TruePassword;
-    set
-    {
-        Model.TruePassword = value;
-        string result = string.Empty;
-        for (int i = 0; i < value.Length; i++)
-        {
-            result += ReplacingCharacters;
-        }
-        UIPassword = result;
-        OnPropertyChanged(nameof(TruePassword));
+    public MPasswordBoxViewModel() { }
 
-        //调用这句话即可在密码改变时,自动检测强度并执行动画
-        OnConditionsChecked();
+    //默认颜色
+    public static State Default = State.FromType<MPasswordBoxViewModel>()
+        .SetName("default")
+        .SetProperty(x => x.PasswordStrengthColor, Brushes.White)
+        .ToState();
+
+    //密码强度有四个分级，对应四个不同的颜色
+    public static State Level1 = State.FromType<MPasswordBoxViewModel>()
+        .SetName("L1")
+        .SetProperty(x => x.PasswordStrengthColor, Brushes.Tomato)
+        .ToState();
+    public static State Level2 = State.FromType<MPasswordBoxViewModel>()
+        .SetName("L2")
+        .SetProperty(x => x.PasswordStrengthColor, Brushes.Yellow)
+        .ToState();
+    public static State Level3 = State.FromType<MPasswordBoxViewModel>()
+        .SetName("L3")
+        .SetProperty(x => x.PasswordStrengthColor, Brushes.Cyan)
+        .ToState();
+    public static State Level4 = State.FromType<MPasswordBoxViewModel>()
+        .SetName("L4")
+        .SetProperty(x => x.PasswordStrengthColor, Brushes.Lime)
+        .ToState();
+
+    //达到指定密码强度时，切换至指定的State
+    public StateVector<MPasswordBoxViewModel> Condition { get; set; } = StateVector<MPasswordBoxViewModel>.Create()
+        .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 0, Default, (x) => { x.Duration = 0.3; })
+        .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 1, Level1, (x) => { x.Duration = 0.3; })
+        .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 2, Level2, (x) => { x.Duration = 0.3; })
+        .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 3, Level3, (x) => { x.Duration = 0.3; })
+        .AddCondition(x => x.TruePassword.CheckPasswordStrength(8) == 4, Level4, (x) => { x.Duration = 0.3; });
+
+    //真实密码
+    public string TruePassword
+    {
+        get => Model.TruePassword;
+        set
+        {
+            Model.TruePassword = value;
+            string result = string.Empty;
+            for (int i = 0; i < value.Length; i++)
+            {
+                result += ReplacingCharacters;
+            }
+            UIPassword = result;
+            OnPropertyChanged(nameof(TruePassword));
+
+            OnConditionsChecked();
+            //由IConditionalTransition接口规定的方法
+            //StateViewModelBase是实现MVVM并且接入状态机系统【条件切换】功能的最小实现单元,它帮你实现了INotifyPropertyChanged与IConditionalTransition接口
+            //调用这句话即可在密码改变时,检测密码强度并执行动画
+        }
+    }
+
+    /// <summary>
+    /// 用户视觉可见的密码
+    /// </summary>
+    public string UIPassword
+    {
+        get => Model.UIPassword;
+        set
+        {
+            Model.UIPassword = value;
+            OnPropertyChanged(nameof(UIPassword));
+        }
+    }
+
+    /// <summary>
+    /// 用于替换真实密码的字符
+    /// </summary>
+    public string ReplacingCharacters
+    {
+        get => Model.ReplacingCharacters;
+        set
+        {
+            Model.ReplacingCharacters = value;
+            string result = string.Empty;
+            for (int i = 0; i < TruePassword.Length; i++)
+            {
+                result += ReplacingCharacters;
+            }
+            UIPassword = result;
+            OnPropertyChanged(nameof(ReplacingCharacters));
+        }
+    }
+
+    /// <summary>
+    /// 密码强度对应的边框颜色
+    /// </summary>
+    public Brush PasswordStrengthColor
+    {
+        get => Model.PasswordStrengthColor;
+        set
+        {
+            Model.PasswordStrengthColor = value;
+            OnPropertyChanged(nameof(PasswordStrengthColor));
+        }
     }
 }`,"18x_MPwd");
-createCodeBox(`//Transform效果定义
+createCodeBox(`//细节参数,建议定义在所有动画效果之前,可避免因静态字段位置问题导致的问题
+//此处定义了:
+//1.不安全且持续2秒的动画
+//2.安全且持续2秒的动画
+private static Action<TransitionParams> _tp = (x) =>
+{
+    x.IsUnSafe = true;
+    x.Duration = 2;
+};
+private static Action<TransitionParams> _tp2 = (x) =>
+{
+    x.IsUnSafe = false;
+    x.Duration = 2;
+};
+
+//旋转、平移、缩放 效果定义
 private static RotateTransform rotateTransform = new RotateTransform(90, 50, 50);
 private static TranslateTransform translateTransform = new TranslateTransform(-100, -50);
 private static ScaleTransform scaleTransform = new ScaleTransform(2, 2, 50, 50);
 
-//静态绘板,一般用于创建全局的、无需动态修改的、修改不涉及实例对象相关属性值的动画效果
-private static State _component = State.FromType<Grid>()
-    .SetName("TransformChange")
+//静态绘板,一般用于创建 [ 全局的、无需动态修改的 ] 动画效果
+//绘板可以用State,也可以用TransitionBoard
+//此处定义了:
+//1.一个旋转、平移、缩放动画 UnSafe
+//2.一个背景色变换效果 UnSafe
+//3.一个复合动画 Safe
+private static State TransformA = State.FromType<Grid>()
+    .SetName("TransformChange1")
     .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
-    .ToState();//State绘板必须在启动时指定一个TransitionParams
-private static TransitionBoard<Grid> _board = Transition.CreateBoardFromType<Grid>()
-    .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
-    .SetParams(_tp);//TransitionBoard绘板在定义阶段已经指定了TransitionParams对象
-
-//实例绘板,如果修改动画效果往往涉及读取实例对象的属性值从而实现实例与实例之间动画效果差异化,那绘板一定不是static的
-private State Component = State.FromType<Grid>()
-    .SetName("TransformChange")
-    .SetProperty(x => x.Background, Brushes.Cyan)
     .ToState();
-private TransitionBoard<Grid> Board = Transition.CreateBoardFromType<Grid>()
-    .SetProperty(x => x.Background, Brushes.Cyan)
+private static TransitionBoard<Grid> ColorA = Transition.CreateBoardFromType<Grid>()
+    .SetProperty(x => x.Background, Brushes.Tomato)
     .SetParams(_tp);
+private static TransitionBoard<Grid> Compile = Transition.CreateBoardFromType<Grid>()
+    .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
+    .SetProperty(x => x.Background, Brushes.Tomato)
+    .SetParams(_tp2);
 
-//参数,静态和非静态没有使用上需要区分的地方,且使用BeginTransition（）时可选择性地传入新的参数
-private static Action<TransitionParams> _tp = (x) =>
-{
-    x.IsUnSafe = true;
-    //但有一点，静态绘板一般是全局共享的,那么就会推荐启用UnSafe机制使这部分动画效果是不会被打断的
-
-    x.Duration = 2;
-};`,"18x_LotOfActions");
+//实例绘板,一般用于创建 [ 局部的、需要动态修改的 ] 动画效果
+//此处定义了:
+//1.一个透明度变化动画 UnSafe
+private TransitionBoard<Grid> OpacityA = Transition.CreateBoardFromType<Grid>()
+    .SetProperty(x => x.Opacity, 0)
+    .SetParams(_tp);`,"18x_LotOfActions");
 createCodeBox(`private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e)
 {
-    //假设你需要在控件宽度过大时,修改它背景色动画渐变的效果,那么你就可以像这样做
-    if (GD.ActualWidth > 500)
+    //☆ 每个实例都可依据判断结果,呈现不同的透明度变换效果
+    if (GD.ActualWidth < 500)
     {
-        Board.SetProperty(x => x.Background, Brushes.Transparent);
+        OpacityA.SetProperty(x => x.Opacity, 0.6);
     }
 
-    //启用静态绘板
-    GD.BeginTransition(_board);
+    ////1.Safe机制下,一个动画开始执行时一定会打断正在执行中的Safe动画
+    GD.BeginTransition(Compile);
 
-    //启用动态绘板
-    GD.BeginTransition(Board);
+    //2.UnSafe机制下,每个动画分量都独立执行且不可打断
+    //你可将多个UnSafe动画效果分量组合,但请确保动画分量间不存在冲突,并且执行过程中不会有其它存在冲突的动画效果加入
+    GD.BeginTransition(TransformA, _tp);
+    GD.BeginTransition(ColorA);
+    GD.BeginTransition(OpacityA);
 
-    //由于它们都是 Unsafe 的，所以不会打断彼此 ，而是同时执行
-    //如果你希望是 Safe 的，可以将 _boar 组合至 Board中作为动态绘板，然后参数中设置 IsUnSafe为false
+    //3.可以直接判断对象是否符合指定条件,然后依据判断结果决定是否启动绘板定义的动画效果
+    //☆注意: 动画启动时一定会打断执行中的Safe动画,因此OpacityA需要在Compile之前开始
+    GD.IsSatisfy(x => x.ActualWidth < 1000, OpacityA);
+    GD.IsSatisfy(x => x.ActualHeight < 1000, Compile);
 }`,"18x_FinalUse");
     </script>
 </body>
