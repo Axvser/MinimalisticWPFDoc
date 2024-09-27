@@ -215,8 +215,11 @@
             <h3 style="color: aquamarine;">Ⅵ 最佳实践</h3>
             <h4>示例1. MVVM模式下,实现一个密码框,它的边框颜色会依据当前密码强度动态修改</h4>
             <div id="18x_MPwd"></div>
-            <h4>示例2. 非MVVM模式,管理多个对象的动画行为</h4>
+            <h4>示例2. 非MVVM模式,使动画结构清晰、支持动态修改效果</h4>
+            <p>首先,我们需要定义动画效果,在此过程中,需要依据动画实际使用时的一些特点做出不同的定义</p>
             <div id="18x_LotOfActions"></div>
+            <p>然后你可使用这些预先定义的动画,特别是动态修改实例局部动画效果</p>
+            <div id="18x_FinalUse"></div>
         </section>
 
         <!-- Vue 实例 -->
@@ -968,7 +971,26 @@ private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e
     //若该时刻满足宽度小于1000,则启用指向component_shared（State或TransitionBoard）的动画，动画参数为tp_Grid（TransitionParams）
     GD.IsSatisfy(x => x.Width < 1000, component_shared, tp_Grid);
 }`,"18x_IsSatisfy");
-createCodeBox(``,"18x_LifeCircle");
+createCodeBox(`private static Action<TransitionParams> tp_Grid = (x) =>
+{
+    x.Duration = 2;
+    x.Start = () =>
+    {
+        Notification.Message("动画开始前执行一次");
+    };
+    x.Update = () =>
+    {
+        Notification.Message("每一帧开始时执行一次");
+    };
+    x.LateUpdate = () =>
+    {
+        Notification.Message("每一帧结束时执行一次");
+    };
+    x.Completed = () =>
+    {
+        Notification.Message("动画结束时执行一次");
+    };
+};`,"18x_LifeCircle");
 createCodeBox(`//Transform效果定义
 private static RotateTransform rotateTransform = new RotateTransform(90, 50, 50);
 private static TranslateTransform translateTransform = new TranslateTransform(-100, -50);
@@ -1059,7 +1081,54 @@ public string TruePassword
         OnConditionsChecked();
     }
 }`,"18x_MPwd");
-createCodeBox(``,"18x_LotOfActions");
+createCodeBox(`//Transform效果定义
+private static RotateTransform rotateTransform = new RotateTransform(90, 50, 50);
+private static TranslateTransform translateTransform = new TranslateTransform(-100, -50);
+private static ScaleTransform scaleTransform = new ScaleTransform(2, 2, 50, 50);
+
+//静态绘板,一般用于创建全局的、无需动态修改的、修改不涉及实例对象相关属性值的动画效果
+private static State _component = State.FromType<Grid>()
+    .SetName("TransformChange")
+    .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
+    .ToState();//State绘板必须在启动时指定一个TransitionParams
+private static TransitionBoard<Grid> _board = Transition.CreateBoardFromType<Grid>()
+    .SetProperty(x => x.RenderTransform, rotateTransform, translateTransform, scaleTransform)
+    .SetParams(_tp);//TransitionBoard绘板在定义阶段已经指定了TransitionParams对象
+
+//实例绘板,如果修改动画效果往往涉及读取实例对象的属性值从而实现实例与实例之间动画效果差异化,那绘板一定不是static的
+private State Component = State.FromType<Grid>()
+    .SetName("TransformChange")
+    .SetProperty(x => x.Background, Brushes.Cyan)
+    .ToState();
+private TransitionBoard<Grid> Board = Transition.CreateBoardFromType<Grid>()
+    .SetProperty(x => x.Background, Brushes.Cyan)
+    .SetParams(_tp);
+
+//参数,静态和非静态没有使用上需要区分的地方,且使用BeginTransition（）时可选择性地传入新的参数
+private static Action<TransitionParams> _tp = (x) =>
+{
+    x.IsUnSafe = true;
+    //但有一点，静态绘板一般是全局共享的,那么就会推荐启用UnSafe机制使这部分动画效果是不会被打断的
+
+    x.Duration = 2;
+};`,"18x_LotOfActions");
+createCodeBox(`private void OnClick1(object sender, System.Windows.Input.MouseButtonEventArgs e)
+{
+    //假设你需要在控件宽度过大时,修改它背景色动画渐变的效果,那么你就可以像这样做
+    if (GD.ActualWidth > 500)
+    {
+        Board.SetProperty(x => x.Background, Brushes.Transparent);
+    }
+
+    //启用静态绘板
+    GD.BeginTransition(_board);
+
+    //启用动态绘板
+    GD.BeginTransition(Board);
+
+    //由于它们都是 Unsafe 的，所以不会打断彼此 ，而是同时执行
+    //如果你希望是 Safe 的，可以将 _boar 组合至 Board中作为动态绘板，然后参数中设置 IsUnSafe为false
+}`,"18x_FinalUse");
     </script>
 </body>
 </html>
