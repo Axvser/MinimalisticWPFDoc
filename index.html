@@ -184,7 +184,7 @@
                     <button @Click="a5Click">Ⅴ 生命周期</button>
                     <button @Click="a6Click">Ⅵ UnSafe机制</button>
                     <button @Click="a7Click">Ⅶ 最佳实践</button>
-                    <button @Click="a8Click">Ⅷ 接口</button>
+                    <button @Click="a8Click">Ⅷ 线性插值工具</button>
                     <button @Click="a9Click">Ⅸ 更多</button>
                 </nav>
                 <div class="content">
@@ -194,27 +194,16 @@
                         <h3>MinimalisticWPF是一个可用于创建、修改WPF动画的类库</h3>
                         <p>它允许你直接创建对于对象属性的平滑过渡效果,这是动画效果能够实现的核心思路</p>
                         <p>同时,它在MVVM设计模式中,可以像Unity等游戏引擎中的状态机一样,通过预先设定一些 [ 条件 => 动画 ] 对照关系,可以自动修改ViewModel属性值从而实现动画效果</p>
-                        <h2>2.MinimalisticWPF的优点?</h2>
+                        <h2>2.MinimalisticWPF的特点?</h2>
                         <h3>(1)以更少的代码量实现动画</h3>
-                        <p>纯粹的C#写法,适合喜欢写后端的人员</p>
-                        <p>不需要关注DependencyProperty,只要一个属性的get器和set器都可访问且其类型受到类库支持,那都是可以直接为这个属性创建过渡的</p>
-                        <p>对于任何类型AnyClass的实例对象都可以用 [ AnyClass.Transition() ] [ AnyClass.BeginTransition() ] 来创建属性值的过渡效果
-                        </p>
-                        <h3>(2)以更清晰、灵活的方式实现动画</h3>
+                        <p>纯粹的C#写法</p>
+                        <p>语义简短清晰</p>
+                        <h3>(2)以更灵活的方式实现动画</h3>
+                        <p>它并不受到依赖属性的限制,随时、随处地创建对属性的渐变效果</p>
+                        <p>它的Unsafe机制能像搭积木那样创建动画</p>
+                        <p>API风格自1.8.0后已经非常统一、易于记忆了</p>
                         <h3>(3)以更轻松的方式管理每一帧</h3>
-                        <h2>3.MinimalisticWPF的缺点？</h2>
-                        <h3>(1)它的性能大概率低于storyboard、visualtstate</h3>
-                        <h3>(2)它难以实现在时间维度拥有复杂变化的动画(暂时)</h3>
-                        <h3>(3)……</h3>
-                        <h2>4.为什么选择MinimalisticWPF?</h2>
-                        <h3>(1)写起来方便</h3>
-                        <p>这是最关键的因素</p>
-                        <p>实际上,写这个项目只是觉得不喜欢WPF动画那套写法</p>
-                        <p>而且,依赖属性这个东西想要随时随地获取并不算容易,那我不如将精力完全放在 [ 属性 ] 本身的过渡</p>
-                        <h3>(2)MVVM模式支持</h3>
-                        <p>又是个人习惯问题</p>
-                        <p>我喜欢XAML内只负责布局与数据绑定、Model负责数据、DataContext负责剩下的，这个才是MinimalisticWPF功效最大化的使用场景</p>
-                        <p>不过不这么用也行的,动画全放Code-Behind而不是DataContext,一样可以受到类库带来的便利</p>
+                        <p>像游戏引擎里的生命周期机制那样,该库在加载动画时,你可以很方便地进行流程控制</p>
                     </div>
                     <div v-show="Area==='2'">
                         <h1>入门</h1>
@@ -338,13 +327,42 @@
                         <div id="cd7-3"></div>                    
                     </div>
                     <div v-show="Area==='8'">
-                        <h1>接口</h1>
-                        <div></div>
-                        <div></div>
-                        <div></div>
+                        <h1>线性插值工具</h1>
+                        <h2>ILinearInterpolation 接口</h2>
+                        <h3>什么是线性插值?</h3>
+                        <p>给出一个起始值start与目标值end,然后假定你需要steps个步骤数,从start变换到end,那么变换过程中的每个中间值就是一个插值</p>
+                        <h3>为什么要有这个接口?</h3>
+                        <p>因为状态机默认只支持以下类型的属性做出线性过渡:</p>
+                        <p>(1) double</p>
+                        <p>(2) Brush</p>
+                        <p>(3) Point</p>
+                        <p>(4) Transform</p>
+                        <p>(5) CornerRadius</p>
+                        <p>(6) Thickness</p>
+                        <h3>而ILinearInterpolation将允许你自定义的类型参与到状态机过渡</h3>
+                        <h2>1.静态工具</h2>
+                        <h3>Computing(object? start, object? end, int steps) 函数</h3>
+                        <p>(1) start起始值</p>
+                        <p>(2) end目标值</p>
+                        <p>(3) steps插值总数</p>
+                        <h3>在你实现接口的过程中,会要求你实现 [ List&lt;object?&gt; Interpolate(object? current, object? target, int steps) ] 方法,这是一个线性插值算法实现</h3>
+                        <p>很多时候你自定义的类型可能大多是几种属性的复合,因此可以使用静态工具便捷地实现自定义插值算法</p>
+                        <p style="color: rgb(255, 111, 238);">注意 : 不一定非得是线性的!</p>
+                        <p style="color: rgb(255, 111, 238);">如果,你的插值在xy图中呈现出其它非线性关系,那么OK,没问题,动画就是会按照你的插值效果来执行</p>
+                        <p style="color: rgb(255, 111, 238);">例如 : 一个正弦曲线,甚至是贝塞尔曲线…………只要你能实现这个自定义插值逻辑</p>
+                        <p style="color: Lime;">所以,动画效果其实是可以高度自定义的,这也是为什么插值接口如此重要的原因</p>
+                        <h2>2.实践案例</h2>
+                        <p>(1) 你自定义了Class1,希望它能参与状态机的过渡效果</p>
+                        <p>在此过程中你使用插值工具方便了接口方法的实现</p>
+                        <div id="cd8-1"></div>
+                        <p>(2) 你自定义了Class2,并拥用一个Class1属性</p>
+                        <div id="cd8-2"></div>
+                        <p>(3) 你已能够对自定义的Class1做出线性过渡</p>
+                        <div id="cd8-3"></div>
                     </div>
                     <div v-show="Area==='9'">
                         <h1>更多</h1>
+                        <h1>这里是拓展性的内容,并非核心,将不间断更新</h1>
                         <div></div>
                         <div></div>
                         <div></div>
@@ -722,10 +740,50 @@ public class MPasswordBoxViewModel : ViewModelBase<MPasswordBoxViewModel, MPassw
                                  FontSizeConvertRate="0.7"
                                  TextBrush="White"/>
 </UserControl.DataContext>`, 'cd7-4');
-                createCodeBox(``, 'cd8-1');
-                createCodeBox(``, 'cd8-2');
-                createCodeBox(``, 'cd8-3');
-                createCodeBox(``, 'cd8-4');
+                createCodeBox(`public class Class1 : ILinearInterpolation
+{
+    public object Current { get; set; }
+    public List<object?> Interpolate(object? current, object? target, int steps)
+    {
+        List<object?> result = new List<object?>();
+
+        var v1 = current as Class1 ?? new Class1();
+        var v2 = target as Class1 ?? new Class1();
+        var itemsA = ILinearInterpolation.CornerRadiusComputing(v1.CornerRadius, v2.CornerRadius, steps);
+        var itemsB = ILinearInterpolation.ThicknessComputing(v1.Thickness, v2.Thickness, steps);
+        for (var i = 0; i < itemsA.Count; i++)
+        {
+            var temp = new Class1();
+            temp.CornerRadius = itemsA[i] as CornerRadius? ?? new CornerRadius();
+            temp.Thickness = itemsB[i] as Thickness? ?? new Thickness();
+            result.Add(temp);
+        }
+
+        return result;
+    }
+
+
+    public Class1() { Current = this; }
+    public Class1(CornerRadius cornerRadius, Thickness thickness) { Current = this; CornerRadius = cornerRadius; Thickness = thickness; }
+    public CornerRadius CornerRadius { get; set; } = new CornerRadius();
+    public Thickness Thickness { get; set; } = new Thickness();
+}`, 'cd8-1');
+                createCodeBox(`public class Class2
+{
+    public Class2() { }
+
+    public Class1 TransitionableProperty = new Class1();
+}`, 'cd8-2');
+                createCodeBox(`var test = new Class2();
+var newValue = new Class1();
+test.Transition()
+    .SetProperty(x => x.TransitionableProperty, newValue)
+    .SetParams((p) =>
+    {
+        p.Duration = 1;
+    })
+    .Start();`, 'cd8-3');
+                createCodeBox(``, '');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
