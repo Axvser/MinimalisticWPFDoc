@@ -84,6 +84,11 @@
         border-radius: 10px;
     }
 
+    p {
+        width: 800px; /* 设置段落的宽度 */
+        overflow-wrap: break-word; /* 允许在单词内部换行 */
+    }
+
     h1 {
         color: #00fff2;
     }
@@ -94,6 +99,7 @@
 
     h3 {
         color: rgb(246, 249, 167);
+        width: 700px;
     }
 
     div {
@@ -162,7 +168,7 @@
     <div id="app">
         <header>
             <h1>MinimalisticWPF</h1>
-            <p style="color: aquamarine;">探索简洁、清晰、易于管理的WPF动画实现方案</p>
+            <h2>探索简洁、清晰、易于管理的WPF动画实现方案</h2>
             <section>
                 <select v-model="Version" class="custom-select">
                     <option value="1.5.x">V1.5.x</option>
