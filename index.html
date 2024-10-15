@@ -85,8 +85,10 @@
     }
 
     p {
-        width: 800px; /* 设置段落的宽度 */
-        overflow-wrap: break-word; /* 允许在单词内部换行 */
+        width: 800px;
+        /* 设置段落的宽度 */
+        overflow-wrap: break-word;
+        /* 允许在单词内部换行 */
     }
 
     h1 {
@@ -113,6 +115,7 @@
     }
 
     nav {
+        overflow-y: auto;
         width: 200px;
         background-color: #444343;
         padding: 15px;
@@ -190,26 +193,33 @@
                     <button @Click="a5Click">Ⅴ 生命周期</button>
                     <button @Click="a6Click">Ⅵ UnSafe机制</button>
                     <button @Click="a7Click">Ⅶ 最佳实践</button>
-                    <button @Click="a8Click">Ⅷ 线性插值工具</button>
-                    <button @Click="a9Click">Ⅸ 更多</button>
+                    <button @Click="a8Click">Ⅷ 常见问题</button>
+                    <div>
+                        <button @click="expend">Ⅸ 更多 {{ ExpendText }}</button>
+                        <div v-show="isMoreOptionsVisible">
+                            <button style="color: palegoldenrod;" @click="a9Click">动画参数</button>
+                            <button style="color: palegoldenrod;" @click="a10Click">插值接口</button>
+                            <button style="color: palegoldenrod;" @click="a11Click">过渡控制器</button>
+                            <button style="color: palegoldenrod;" @click="a12Click">过渡执行器</button>
+                        </div>
+                    </div>
                 </nav>
                 <div class="content">
                     <div v-show="Area==='1'">
                         <h1>简介</h1>
                         <h2>1.MinimalisticWPF是什么?</h2>
-                        <h3>MinimalisticWPF是一个可用于创建、修改WPF动画的类库</h3>
-                        <p>它允许你直接创建对于对象属性的平滑过渡效果,这是动画效果能够实现的核心思路</p>
-                        <p>同时,它在MVVM设计模式中,可以像Unity等游戏引擎中的状态机一样,通过预先设定一些 [ 条件 => 动画 ] 对照关系,可以自动修改ViewModel属性值从而实现动画效果</p>
+                        <h3>一套WPF动画实现方案</h3>
+                        <p>- 它完全绕开WPF原生动画系统,转而将注意力放在 [ 属性 ] 本身,通过计算并应用插值,实现动画</p>
+                        <p>- 它允许你像游戏引擎中的 [ 状态机 ] 那样,通过预先设定一些 [ 条件 → 动画 ] 对照关系,自动修改属性值从而实现动画效果</p>
                         <h2>2.MinimalisticWPF的特点?</h2>
-                        <h3>(1)以更少的代码量实现动画</h3>
-                        <p>纯粹的C#写法</p>
-                        <p>语义简短清晰</p>
-                        <h3>(2)以更灵活的方式实现动画</h3>
-                        <p>它并不受到依赖属性的限制,随时、随处地创建对属性的渐变效果</p>
-                        <p>它的Unsafe机制能像搭积木那样创建动画</p>
-                        <p>API风格自1.8.0后已经非常统一、易于记忆了</p>
-                        <h3>(3)以更轻松的方式管理每一帧</h3>
-                        <p>像游戏引擎里的生命周期机制那样,该库在加载动画时,你可以很方便地进行流程控制</p>
+                        <h3>简洁、灵活、功能可延展</h3>
+                        <p>- 完全以C#代码实现动画</p>
+                        <p>- 不受 [ 依赖属性 ] 限制 , 只要 [ 属性 ] 可读写 , 都可对其计算并应用插值</p>
+                        <p>- 轻松控制动画帧 , 就像Unity的Update()、Start()那样</p>
+                        <p>- 可以用于一些数据模拟场景 , 计算模拟数据的逻辑可依据接口定制</p>
+                        <h2>3.MinimalisticWPF的缺陷?</h2>
+                        <p>- 性能尚未得到验证</p>
+                        <p>- 特殊旋转角处理效果异常</p>
                     </div>
                     <div v-show="Area==='2'">
                         <h1>入门</h1>
@@ -328,15 +338,121 @@
                         <h3>4.ViewModel为什么可以拥有OnConditionsChecked()</h3>
                         <p>因为ViewModelBase继承了StateViewModelBase,而StateViewModelBase实现了一些必要的接口</p>
                         <p>(1)INotifyPropertyChanged - 这个我想无需多言,用过MVVM都懂</p>
-                        <p>(2)IConditionalTransition - 这个接口是你可以用 [ this.StateMachineLoading(ViewModel) ] 激活条件切换功能的关键组件</p>
+                        <p>(2)IConditionalTransition - 这个接口是你可以用 [ this.StateMachineLoading(ViewModel) ] 激活条件切换功能的关键组件
+                        </p>
                         <p>(3)这里是它的定义,几乎是MVVM下最小实现单元</p>
-                        <div id="cd7-3"></div>                    
+                        <div id="cd7-3"></div>
                     </div>
                     <div v-show="Area==='8'">
+                        <h2>P1. 为什么控件的Width和Height无法应用动画效果?</h2>
+                        <h3>2024-10-15</h3>
+                        <p>解释:</p>
+                        <p>Margin不结合HorizontalAlignment与VerticalAlignment使用时 , 宽高会受到限制</p>
+                        <p>方案:</p>
+                        <p>1.直接对Margin属性加载动画</p>
+                        <p>2.设置HorizontalAlignment与VerticalAlignment可以分别解锁Width和Height的限制</p>
+                    </div>
+                    <div v-show="Area==='9'">
+                        <h1>动画参数表</h1>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>属性</th>
+                                    <th>类型</th>
+                                    <th>默认值</th>
+                                    <th>含义</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Start</td>
+                                    <td>Action</td>
+                                    <td>null</td>
+                                    <td>在动画开始前执行一次</td>
+                                </tr>
+                                <tr>
+                                    <td>Update</td>
+                                    <td>Action</td>
+                                    <td>null</td>
+                                    <td>在动画的每一帧开始前执行一次</td>
+                                </tr>
+                                <tr>
+                                    <td>LateUpdate</td>
+                                    <td>Action</td>
+                                    <td>null</td>
+                                    <td>在动画的每一帧结束后执行一次</td>
+                                </tr>
+                                <tr>
+                                    <td>Completed</td>
+                                    <td>Action</td>
+                                    <td>null</td>
+                                    <td>在动画结束后执行一次</td>
+                                </tr>
+                                <tr>
+                                    <td>FrameRate</td>
+                                    <td>int</td>
+                                    <td>120</td>
+                                    <td>帧率 （ HZ ）</td>
+                                </tr>
+                                <tr>
+                                    <td>Duration</td>
+                                    <td>double</td>
+                                    <td>0 s</td>
+                                    <td>持续时间 （ S ）</td>
+                                </tr>
+                                <tr>
+                                    <td>IsAutoReverse</td>
+                                    <td>bool</td>
+                                    <td>false</td>
+                                    <td>动画结束后是否自动回到原状</td>
+                                </tr>
+                                <tr>
+                                    <td>LoopTime</td>
+                                    <td>int</td>
+                                    <td>0</td>
+                                    <td>循环播报次数</td>
+                                </tr>
+                                <tr>
+                                    <td>Acceleration</td>
+                                    <td>double</td>
+                                    <td>0</td>
+                                    <td>加速率 , 取值范围 [-1,1]</td>
+                                </tr>
+                                <tr>
+                                    <td>IsUnSafe</td>
+                                    <td>bool</td>
+                                    <td>false</td>
+                                    <td>是否启用Unsafe机制</td>
+                                </tr>
+                                <tr>
+                                    <td>IsQueue</td>
+                                    <td>bool</td>
+                                    <td>false</td>
+                                    <td>是否排队等待执行</td>
+                                </tr>
+                                <tr>
+                                    <td>IsLast</td>
+                                    <td>bool</td>
+                                    <td>false</td>
+                                    <td>是否在动画结束时清除动画队列</td>
+                                </tr>
+                                <tr>
+                                    <td>IsUnique</td>
+                                    <td>bool</td>
+                                    <td>true</td>
+                                    <td>如果已经有一个动画指向一个指定名称的状态，
+                                        这次是否应该将动画添加到队列中，即是否
+                                        动画是独一无二的</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div v-show="Area==='10'">
                         <h1>线性插值工具</h1>
                         <h2>ILinearInterpolation 接口</h2>
                         <h3>什么是线性插值?</h3>
-                        <p>给出一个起始值start与目标值end,然后假定你需要steps个步骤数,从start变换到end,那么变换过程中的每个中间值就是一个插值</p>
+                        <p>给出一个起始值start与目标值end,然后假定你需要steps个步骤数,从start变换到end,那么变换过程中的每个中间值就是一个 [ 插值 ]</p>
+                        <p>当插值在 [ 值/时间 ] 图中呈现出直线时,称之为 [ 线性 ]</p>
                         <h3>为什么要有这个接口?</h3>
                         <p>因为状态机默认只支持以下类型的属性做出线性过渡:</p>
                         <p>(1) double</p>
@@ -346,12 +462,13 @@
                         <p>(5) CornerRadius</p>
                         <p>(6) Thickness</p>
                         <h3>而ILinearInterpolation将允许你自定义的类型参与到状态机过渡</h3>
-                        <h2>1.静态工具</h2>
+                        <h2>1.静态工具</h2>【
                         <h3>Computing(object? start, object? end, int steps) 函数</h3>
                         <p>(1) start起始值</p>
                         <p>(2) end目标值</p>
                         <p>(3) steps插值总数</p>
-                        <h3>在你实现接口的过程中,会要求你实现 [ List&lt;object?&gt; Interpolate(object? current, object? target, int steps) ] 方法,这是一个线性插值算法实现</h3>
+                        <h3>在你实现接口的过程中,会要求你实现 [ List&lt;object?&gt; Interpolate(object? current, object? target, int
+                            steps) ] 方法,这是一个线性插值算法实现</h3>
                         <p>很多时候你自定义的类型可能大多是几种属性的复合,因此可以使用静态工具便捷地实现自定义插值算法</p>
                         <p style="color: rgb(255, 111, 238);">注意 : 不一定非得是线性的!</p>
                         <p style="color: rgb(255, 111, 238);">如果,你的插值在xy图中呈现出其它非线性关系,那么OK,没问题,动画就是会按照你的插值效果来执行</p>
@@ -364,14 +481,15 @@
                         <p>(2) 你自定义了Class2,并拥用一个Class1属性</p>
                         <div id="cd8-2"></div>
                         <p>(3) 你已能够对自定义的Class1做出线性过渡</p>
-                        <div id="cd8-3"></div>
+                        <div id="cd8-3"></div>          
                     </div>
-                    <div v-show="Area==='9'">
-                        <h1>更多</h1>
-                        <h1>这里是拓展性的内容,并非核心,将不间断更新</h1>
-                        <div></div>
-                        <div></div>
-                        <div></div>
+                    <div v-show="Area==='11'">
+                        <h1>StateMachine</h1>
+                        <h2>管理对象实例在不同State间的切换行为</h2>
+                    </div>
+                    <div v-show="Area==='12'">
+                        <h1>Interpreter</h1>
+                        <h2>实现对象从一个State过渡至另一个State</h2>
                     </div>
                 </div>
             </div>
@@ -456,12 +574,27 @@
             },
             a9Click() {
                 this.Area = '9';
+            },
+            a10Click() {
+                this.Area = '10';
+            },
+            a11Click() {
+                this.Area = '11';
+            },
+            a12Click() {
+                this.Area = '12';
+            },
+            expend(){
+                this.isMoreOptionsVisible = !this.isMoreOptionsVisible;
+                this.ExpendText = this.isMoreOptionsVisible?'▲':'▼';
             }
         },
         data: {
             Version: '1.8.x',
             Area: '1',
             MarkDown: '',
+            isMoreOptionsVisible: false,
+            ExpendText:'▼',
         },
         mounted() {
             //代码框
