@@ -176,10 +176,34 @@
                 <select v-model="Version" class="custom-select">
                     <option value="1.5.x">V1.5.x</option>
                     <option value="1.8.x">V1.8.x</option>
+                    <option value="更新详情">更新详情</option>
                 </select>
                 <div v-html="renderedMarkdown"></div>
             </section>
         </header>
+
+        <!--V1.9.x-->
+        <div v-show="Version==='更新详情'">
+            <div class="container">
+                <nav>
+                    <h1>目录</h1>
+                    <button @Click="C182">v 1.8.2</button>
+                    <button @Click="C185">v 1.8.5</button>
+                    <button @Click="C187">v 1.8.7</button>
+                </nav>
+                <div class="content">
+                    <div v-show="Area==='C182'">
+
+                    </div>
+                    <div v-show="Area==='C185'">
+
+                    </div>
+                    <div v-show="Area==='C187'">
+
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!--V1.8.x-->
         <div v-show="Version==='1.8.x'">
@@ -591,6 +615,15 @@
             expend(){
                 this.isMoreOptionsVisible = !this.isMoreOptionsVisible;
                 this.ExpendText = this.isMoreOptionsVisible?'▲':'▼';
+            },
+            C182(){
+                this.Area='C182';
+            },
+            C185(){
+                this.Area='C185';
+            },
+            C187(){
+                this.Area='C187';
             }
         },
         data: {
