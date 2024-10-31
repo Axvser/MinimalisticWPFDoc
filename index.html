@@ -172,11 +172,11 @@
         <header>
             <h1>MinimalisticWPF</h1>
             <h2>探索简洁、清晰、易于管理的WPF动画实现方案</h2>
-            <section>
-                <select v-model="Version" class="custom-select">
-                    <option value="1.5.x">V1.5.x</option>
-                    <option value="1.8.x">V1.8.x</option>
-                    <option value="更新详情">更新详情</option>
+            <section>版本 ⇨ 
+                <select v-model="Version" class="custom-select">s
+                    <option value="1.5.x">V1.5.x      </option>
+                    <option value="1.8.x">V1.8.x      </option>
+                    <option value="更新详情">Updates</option>
                 </select>
                 <div v-html="renderedMarkdown"></div>
             </section>
@@ -192,14 +192,41 @@
                     <button @Click="C187">v 1.8.7</button>
                 </nav>
                 <div class="content">
+                    <diV v-show="Area!='C182'&&Area!='C185'&&Area!='C187'">
+                        <h1>历史版本变动</h1>
+                        <p>选择版本以查看详情</p>
+                    </diV>
                     <div v-show="Area==='C182'">
-
+                        <h1>[ V 1.8.2 ]</h1>
+                        <p>1.动画可以通过设置 [ LoopTime ] 参数实现循环播报,当你设置为 int.MaxValue 时,代表无限循环</p>
+                        <p>2.动画可以通过设置 [ IsAutoReverse ] 参数实现自动返回到动画起始状态</p>
                     </div>
                     <div v-show="Area==='C185'">
-
+                        <h1>[ V 1.8.5 ]</h1>
+                        <p>1.生命周期已支持 [ async ] 操作</p>
+                        <p>2.可在定义阶段使用 [ Preload() ] 预载帧数据</p>
+                        <div id="C185-1"></div>
                     </div>
                     <div v-show="Area==='C187'">
-
+                        <h1>[ V 1.8.7 ]</h1>
+                        <h2>1.为AOP(面向切面编程)的实现提供了简化的流程</h2>
+                        <h3>接下来我们以拦截TObj的GetName方法调用为例</h3>
+                        <p>(1)首先,将需要拦截的属性/方法抽象到一个接口中</p>
+                        <div id="C187-1"></div>
+                        <p>(2)接着,创建TObj实例的代理对象pro,并拦截GetName方法</p>
+                        <p>- 此时GetName方法在执行前、执行后均会执行额外的自定义逻辑</p>
+                        <p>- 此时GetName方法的返回值已经被覆写</p>
+                        <div id="C187-2"></div>
+                        <p>(3)最后,通过pro对象调取的GetName方法已能执行你SetMethod中扩展/覆写的新逻辑,你还可以通过SetPropertySetter与SetPropertyGetter对Name属性的get器和set器调用做拦截并扩展/覆写,并且,如果你为pro代理的Name属性赋值,那么obj原始对象的Name属性也会做出同等变化(除非你覆写了默认逻辑)</p>
+                        <h2>2.使用户控件可像Page那样,在指定容器内切换</h2>
+                        <p>(1)首先,用作页面的用户控件需要实现IPageNavigate接口</p>
+                        <div id="C187-3"></div>
+                        <p>(2)接着,在XAML中使用特定容器MPageBox</p>
+                        <div id="C187-4"></div>
+                        <p>(3)最后,可以使用唯一名称或控件类型实现页面切换</p>
+                        <div id="C187-5"></div>
+                        <h2>3.减少帧数据计算过程中List的扩容行为</h2>
+                        <P>创建List时提前依据帧数定义了初始长度,理论可以减少不必要的扩容操作以优化性能</P>
                     </div>
                 </div>
             </div>
@@ -232,18 +259,22 @@
                     <div v-show="Area==='1'">
                         <h1>简介</h1>
                         <h2>1.MinimalisticWPF是什么?</h2>
-                        <h3>一套WPF动画实现方案</h3>
+                        <h3>一套WPF动画实现方案 [ 核心 ]</h3>
                         <p>- 它完全绕开WPF原生动画系统,转而将注意力放在 [ 属性 ] 本身,通过计算并应用插值,实现动画</p>
                         <p>- 它允许你像游戏引擎中的 [ 状态机 ] 那样,通过预先设定一些 [ 条件 → 动画 ] 对照关系,自动修改属性值从而实现动画效果</p>
                         <h2>2.MinimalisticWPF的特点?</h2>
-                        <h3>简洁、灵活、功能可延展</h3>
+                        <h3>简洁、灵活</h3>
                         <p>- 完全以C#代码实现动画</p>
                         <p>- 不受 [ 依赖属性 ] 限制 , 只要 [ 属性 ] 可读写 , 都可对其计算并应用插值</p>
                         <p>- 轻松控制动画帧 , 就像Unity的Update()、Start()那样</p>
                         <p>- 可以用于一些数据模拟场景 , 计算模拟数据的逻辑可依据接口定制</p>
                         <h2>3.MinimalisticWPF的缺陷?</h2>
                         <p>- 性能尚未得到验证</p>
-                        <p>- 特殊旋转角处理效果异常</p>
+                        <p>- 特殊旋转角处理效果不理想</p>
+                        <h2>4.其它WPF相关功能的简化 [ 扩展 ]</h2>
+                        <p>- string扩展包含了常见的值转换,正则捕获,模糊匹配操作</p>
+                        <p>- AOP(面向切面编程)流程简化,你可轻松为自定义类型的属性/方法做拦截,并扩展/修改它们的调用逻辑 [ V 1.8.7 及以上 ]</p>
+                        <p>- UserControl仅一次接口实现,即可作为Page,在特定容器MPageBox中切换 [ V 1.8.7 及以上 ]</p>
                     </div>
                     <div v-show="Area==='2'">
                         <h1>入门</h1>
@@ -490,7 +521,7 @@
                         <p>(5) CornerRadius</p>
                         <p>(6) Thickness</p>
                         <h3>而ILinearInterpolation将允许你自定义的类型参与到状态机过渡</h3>
-                        <h2>1.静态工具</h2>【
+                        <h2>1.静态工具</h2>
                         <h3>Computing(object? start, object? end, int steps) 函数</h3>
                         <p>(1) start起始值</p>
                         <p>(2) end目标值</p>
@@ -959,6 +990,71 @@ test.Transition()
         p.Duration = 1;
     })
     .Start();`, 'cd8-3');
+                createCodeBox(`var data = gd.Transition()
+              .SetProperty(x => x.Width, 100)
+              .SetParams((x) =>
+              {
+                  x.Duration = 0.5;
+                  x.StartAsync = async () =>
+                  {
+                      await Task.Delay(500);
+                  };
+              })
+              .PreLoad();
+data.Start();`, 'C185-1');
+                createCodeBox(`public interface IPropertyProxy : IProxy
+{
+    string Name { get; set; }
+    string GetName();
+}
+public class TObj : IPropertyProxy
+{
+    public TObj() { }
+
+    public string Name { get; set; } = "defaultValue";
+
+    public string GetName()
+    {
+        return "defaultResult";
+    }
+}`, 'C187-1');
+                createCodeBox(`TObj obj = new TObj();
+IPropertyProxy pro = obj.CreateProxy<IPropertyProxy>();
+pro.SetMethod(nameof(pro.GetName), 
+            object? (args) => { MessageBox.Show($"before method call"); return null; }, 
+            object? (args) => { return "coverage result"; }, 
+            object? (args) => { MessageBox.Show($"after method call"); return null; });`, 'C187-2');
+                createCodeBox(`public partial class Page1 : UserControl, IPageNavigate
+{
+    public Page1()
+    {
+        InitializeComponent();
+    }
+
+    public string GetPageName()
+    {
+        return "page1";
+    }
+
+    public object GetPage()
+    {
+        return new Page1();
+    }
+}`, 'C187-3');
+                createCodeBox(`xmlns:mn="clr-namespace:MinimalisticWPF;assembly=MinimalisticWPF"
+
+<mn:MPageBox x:Name="Pages" 
+             NavigateMode="None" 
+             SlideDirection="RightToLeft" 
+             Acceleration="1" 
+             FrameRate="120"/>`, 'C187-4');
+                createCodeBox(`  Pages.Navigate("Page1");
+
+  Pages.Navigate(typeof(Page1));`, 'C187-5');
+                createCodeBox(``, '');
+                createCodeBox(``, '');
+                createCodeBox(``, '');
+                createCodeBox(``, '');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
