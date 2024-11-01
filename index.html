@@ -1065,9 +1065,9 @@ pro.SetMethod(nameof(pro.GetName),
 
   Pages.Navigate(typeof(Page1));`, 'C187-5');
                 createCodeBox(`pro.SetMethod(nameof(pro.GetName),
-              object? (args, last) => { MessageBox.Show($"before default method"); return "AOP before\n"; },
-              object? (args, last) => { return $"{last}AOP Coverage \n"; },
-              object? (args, last) => { MessageBox.Show($"results :\n{last}AOP after\n"); return null; });`, 'C188-1');
+              object? (args, last) => { MessageBox.Show($"before default method"); return "AOP before\\n"; },
+              object? (args, last) => { return $"{last}AOP Coverage \\n"; },
+              object? (args, last) => { MessageBox.Show($"results :\\n{last}AOP after\\n"); return null; });`, 'C188-1');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
