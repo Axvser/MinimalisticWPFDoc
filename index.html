@@ -191,9 +191,10 @@
                     <button @Click="C185">v 1.8.5</button>
                     <button @Click="C187">v 1.8.7</button>
                     <button @Click="C188">v 1.8.8</button>
+                    <button @Click="C190">v 1.9.0</button>
                 </nav>
                 <div class="content">
-                    <diV v-show="Area!='C182'&&Area!='C185'&&Area!='C187'&&Area!='C188'">
+                    <diV v-show="Area!='C182'&&Area!='C185'&&Area!='C187'&&Area!='C188'&&Area!='C190'">
                         <h1>历史版本变动</h1>
                         <p>选择版本以查看详情</p>
                     </diV>
@@ -235,6 +236,29 @@
                         <h2>1.修改AOP扩展/覆写所使用的委托定义</h2>
                         <div id="C188-1"></div>
                         <P>解释：新增一个last参数,它接收上一个方法的返回值</P>
+                    </div>
+                    <div v-show="Area==='C190'">
+                        <h1>[ V 1.9.0 ]</h1>
+                        <h2>动态主题功能支持 [ 测试版 ]</h2>
+                        <p>下述示例演示了如何为自定义控件提供动态主题切换功能</p>
+                        <p>- 首先,为目标属性挂载特性</p>
+                        <div id="C190-1"></div>
+                        <p>- 接着,有三种方式为对象切换主题</p>
+                        <P>(1) 全局主题切换 - 作用于所有声明了RunWithGlobalTheme的实例</P>
+                        <p>windowBack表示主窗口的背景色</p>
+                        <p>中间其实还可以加一个Action&lt;TransitionParams>用于构建动画效果参数,不写/传入null就代表使用TransitioinParams.Theme定义的默认构造行为,下方的局部切换也有这个参数</p>
+                        <div id="C190-2"></div>
+                        <p>(2) 选定对象主题切换 - 作用于传入的目标实例</p>
+                        <div id="C190-3"></div>
+                        <p>(3) 对象拥有扩展方法,可以自启动主题切换</p>
+                        <div id="C190-4"></div>
+                        <p>- 当然,你还可以自定义主题</p>
+                        <p>(1) 必要的接口、抽象类</p>
+                        <p>Target是该主题下,属性应处于的值</p>
+                        <div id="C190-5"></div>
+                        <p>(2) 基于特性在声明时传入的参数具备限制,对于特殊类型,需要额外的处理,例如Brush和Transform</p>
+                        <p>考虑到主题一般只基于Brush的渐变,Beta版本并没有对其它类型做额外处理,但未来的版本中会逐步支持,并且未来版本计划支持在主题切换前后添加自定义的行为</p>
+                        <div id="C190-6"></div>
                     </div>
                 </div>
             </div>
@@ -668,7 +692,10 @@
             },
             C188() {
                 this.Area = 'C188';
-            }
+            },
+            C190() {
+                this.Area = 'C190';
+            },
         },
         data: {
             Version: '1.8.x',
@@ -1068,9 +1095,48 @@ pro.SetMethod(nameof(pro.GetName),
               object? (args, last) => { MessageBox.Show($"before default method"); return "AOP before\\n"; },
               object? (args, last) => { return $"{last}AOP Coverage \\n"; },
               object? (args, last) => { MessageBox.Show($"results :\\n{last}AOP after\\n"); return null; });`, 'C188-1');
-                createCodeBox(``, '');
-                createCodeBox(``, '');
-                createCodeBox(``, '');
+                createCodeBox(`public partial class Page1 : UserControl
+    {
+        public Page1()
+        {
+            InitializeComponent();
+
+            this.RunWithGlobalTheme(); //声明为全局作用域的主题
+        }
+
+        [WhenDark(typeof(Brush), nameof(Brushes.Tomato))]   //暗色主题变为“Tomato”
+        [WhenLight(typeof(Brush), nameof(Brushes.Yellow))]  //亮色主题变为“Yellow”
+        public Brush Color
+        {
+            get => txt.Foreground;
+            set => txt.Foreground = value;
+        }
+    }`, 'C190-1');
+                createCodeBox(`DynamicTheme.GlobalApply(typeof(WhenLight), windowBack: Brushes.White);`, 'C190-2');
+                createCodeBox(`var page1 = new Page1();
+var page2 = new Page1();
+DynamicTheme.PartialApply(typeof(WhenLight),null,page1,page2);`, 'C190-3');
+                createCodeBox(`var page = new Page1();
+page.ApplyTheme(typeof(WhenDark),null);`, 'C190-4');
+                createCodeBox(`    [AttributeUsage(AttributeTargets.Property)]
+    public abstract class GlassTheme : Attribute, IThemeAttribute
+    {
+        public GlassTheme() { }
+
+        public object? Target { get; set; }
+    }`, 'C190-5');
+                createCodeBox(`        public WhenLight(Type type, params object?[] param)
+        {
+            if (type == typeof(Brush))
+            {
+                var value = param.FirstOrDefault()?.ToString()?.ToBrush();
+                Target = value ?? Brushes.Transparent;
+            }
+            else
+            {
+                Target = Activator.CreateInstance(type, param);
+            }
+        }`, 'C190-6');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
