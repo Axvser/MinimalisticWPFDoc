@@ -171,18 +171,18 @@
     <div id="app">
         <header>
             <h1>MinimalisticWPF</h1>
-            <h2>探索简洁、清晰、易于管理的WPF动画实现方案</h2>
+            <h2>探索简洁、清晰、易于管理的WPF视觉效果实现方案</h2>
             <section>版本 ⇨
                 <select v-model="Version" class="custom-select">s
                     <option value="1.5.x">V1.5.x </option>
                     <option value="1.8.x">V1.8.x </option>
+                    <option value="1.9.x">V1.9.x </option>
                     <option value="更新详情">Updates</option>
                 </select>
                 <div v-html="renderedMarkdown"></div>
             </section>
         </header>
 
-        <!--V1.9.x-->
         <div v-show="Version==='更新详情'">
             <div class="container">
                 <nav>
@@ -264,11 +264,38 @@
             </div>
         </div>
 
+         <!--V1.9.x-->
+        <div v-show="Version==='1.9.x'">
+            <div class="container">
+                <nav>
+                    <h1>目录</h1>
+                    <button @Click="b1Click">Ⅰ 动画构建</button>
+                    <button @Click="b2Click">Ⅱ MVVM条件执行</button>
+                    <button @Click="b3Click">Ⅲ AOP</button>
+                    <button @Click="b4Click">Ⅳ 动态主题</button>
+                </nav>
+                <div class="content">
+                    <div v-show="Area==='b1'">
+
+                    </div>
+                    <div v-show="Area==='b2'">
+
+                    </div>
+                    <div v-show="Area==='b3'">
+
+                    </div>
+                    <div v-show="Area==='b4'">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!--V1.8.x-->
         <div v-show="Version==='1.8.x'">
             <div class="container">
                 <nav>
-                    <h1>目录</h1>
+                    <h1>目录 [ 停止维护 ]</h1>
                     <button @Click="a1Click">Ⅰ 简介</button>
                     <button @Click="a2Click">Ⅱ 入门</button>
                     <button @Click="a3Click">Ⅲ State</button>
@@ -590,7 +617,7 @@
 
         <!--V1.5.x-->
         <div v-show="Version === '1.5.x'">
-            <h2>中文文档 V{{ Version }}</h2>
+            <h2>中文文档 V{{ Version }} [ 停止维护 ]</h2>
             <div style="background-color: #444;" v-html="Markdown"></div>
         </div>
     </div>
@@ -676,6 +703,18 @@
             },
             a12Click() {
                 this.Area = '12';
+            },
+            b1Click(){
+                this.Area = 'b1';
+            },
+            b2Click(){
+                this.Area = 'b2';
+            },
+            b3Click(){
+                this.Area = 'b3';
+            },
+            b4Click(){
+                this.Area = 'b4';
             },
             expend() {
                 this.isMoreOptionsVisible = !this.isMoreOptionsVisible;
