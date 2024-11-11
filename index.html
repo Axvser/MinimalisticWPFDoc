@@ -192,9 +192,10 @@
                     <button @Click="C187">v 1.8.7</button>
                     <button @Click="C188">v 1.8.8</button>
                     <button @Click="C190">v 1.9.0</button>
+                    <button @Click="C191">v 1.9.1</button>
                 </nav>
                 <div class="content">
-                    <diV v-show="Area!='C182'&&Area!='C185'&&Area!='C187'&&Area!='C188'&&Area!='C190'">
+                    <diV v-show="Area!='C182'&&Area!='C185'&&Area!='C187'&&Area!='C188'&&Area!='C190'&&Area!='C191'">
                         <h1>历史版本变动</h1>
                         <p>选择版本以查看详情</p>
                     </diV>
@@ -259,6 +260,28 @@
                         <p>(2) 基于特性在声明时传入的参数具备限制,对于特殊类型,需要额外的处理,例如Brush和Transform</p>
                         <p>考虑到主题一般只基于Brush的渐变,Beta版本并没有对其它类型做额外处理,但未来的版本中会逐步支持,并且未来版本计划支持在主题切换前后添加自定义的行为</p>
                         <div id="C190-6"></div>
+                    </div>
+                    <div v-show="Area==='C191'">
+                        <h1>[ V 1.9.1 ]</h1>
+                        <h2>1.动态主题相关</h2>
+                        <p>- IThemeAttribute接口要求变更,现在要求定义 object?[]? 表示构造新值所需要的参数</p>
+                        <p>- 简化了默认主题特性的名称 ( Dark & Light )</p>
+                        <p>- 简化了特性传参 ( 参照下方代码 )</p>
+                        <div id="C191-1"></div>
+                        <h2>2.灵活终止过渡行为</h2>
+                        <p>- 使用扩展方法</p>
+                        <div id="C191-2"></div>
+                        <p>- 使用静态方法</p>
+                        <div id="C191-3"></div>
+                        <h2>3.控件导航</h2>
+                        <p>- 新版本直接为控件挂载Navigable即可</p>
+                        <p>- 枚举值决定是否采用单例模式 ( 默认采用单例模式 )</p>
+                        <p>- 容器名称变更 [ MPageBox ] → [ MNavigateBox ]</p>
+                        <div id="C191-4"></div>
+                        <h2>4.状态机优化</h2>
+                        <p>- StateMachine.Create()方法在新版本以后,会优先从对象池寻找已创建的状态机,没找到才会新建状态机</p>
+                        <p>- StateMachine初始化时,对于同一Type,不再执行重复的反射和LINQ操作</p>
+                        <p>- ReSet()方法新增一个可选bool参数,这代表重置状态机时是否要终止UnSafe过渡</p>
                     </div>
                 </div>
             </div>
@@ -735,6 +758,9 @@
             C190() {
                 this.Area = 'C190';
             },
+            C191(){
+                this.Area = 'C191';
+            },
         },
         data: {
             Version: '1.8.x',
@@ -1176,6 +1202,52 @@ page.ApplyTheme(typeof(WhenDark),null);`, 'C190-4');
                 Target = Activator.CreateInstance(type, param);
             }
         }`, 'C190-6');
+                createCodeBox(`        [Dark(nameof(Brushes.Tomato))]
+        [Light("#1e1e1e")]
+        public Brush Color
+        {
+            get => txt.Foreground;
+            set => txt.Foreground = value;
+        }
+
+        [Dark(6)]
+        [Light(16,1,2,0)]
+        public CornerRadius CornerRadius
+        {
+            get => bor.CornerRadius;
+            set => bor.CornerRadius = value;
+        }
+
+        [Dark(0.0)]
+        [Light(1.0)]
+        public double ThemeOpacity
+        {
+            get => Opacity;
+            set => Opacity = value;
+        }
+
+        [Dark(1,1,1,1)]
+        [Light(5)]
+        public Thickness ThemeThickness
+        {
+            get => bor.BorderThickness;
+            set => bor.BorderThickness = value;
+        }`, 'C191-1');
+                createCodeBox(`gd.StopTransition(IsStopSafe: true, IsStopUnSafe: false);
+gd.StopTransition(true,false);
+// bool变量指明是否终止该对象的Safe/UnSafe过渡`, 'C191-2');
+                createCodeBox(`Transition.Dispose()            // 全局中止过渡
+Transition.Stop(gd,gd2);        // 仅中止选中对象的过渡
+Transition.StopSafe(gd,gd2);    // 仅中止选中对象的Safe过渡
+Transition.StopUnSafe(gd,gd2);  // 仅中止选中对象的UnSafe过渡`, 'C191-3');
+                createCodeBox(`  [Navigable(ConstructionModes.Singleton)]
+  public partial class Page2 : UserControl
+  {
+      public Page2()
+      {
+          InitializeComponent();
+      }
+  }`, 'C191-4');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
                 createCodeBox(``, '');
